@@ -1,0 +1,8 @@
+Bazel code generation
+Starlark
+BUILD.bazel
+WORKSPACE
+.bzl rules
+no introduction
+no explanation
+only code

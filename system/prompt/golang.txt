@@ -1,0 +1,7 @@
+Go language code
+no introduction
+no explanation
+functions
+expressions
+statements
+only code
