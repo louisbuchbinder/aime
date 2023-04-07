@@ -34,7 +34,8 @@ func TestReq(t *testing.T) {
 	client, err := ToClient(withFakeRT(
 		func(*http.Request) (*http.Response, error) {
 			return &http.Response{
-				Body: ioutil.NopCloser(strings.NewReader(`{"model":"gpt-3.5-turbo"}`)),
+				StatusCode: 200,
+				Body:       ioutil.NopCloser(strings.NewReader(`{"model":"gpt-3.5-turbo"}`)),
 			}, nil
 		},
 	))
