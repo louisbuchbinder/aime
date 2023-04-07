@@ -5,7 +5,7 @@ A simple tool for working with LLMs. Currently only OpenAI api.
 `go install github.com/louisbuchbinder/aime/cmd/aime@latest`
 
 ### Basic usage
-`aime -key $OPENAI_API_KEY -output inline -prompt "1 + 1 = "
+`aime -key $OPENAI_API_KEY -output inline -prompt "1 + 1 = "`
 
 ### System prompts
 Directly specify the system prompt on the command line with `-systemPrompt`.
