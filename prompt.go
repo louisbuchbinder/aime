@@ -14,7 +14,12 @@ var GolangPrompt string
 //go:embed system/prompt/vim.txt
 var VimPrompt string
 
-func LookupSystemPrompt(key string) string {
+func LookupSystemPrompt(key string, config *Config) string {
+	if config != nil && config.System != nil {
+		if p, ok := config.System[key]; ok {
+			return p
+		}
+	}
 	switch strings.ToLower(key) {
 	case "bazel", "bzl":
 		return BazelPrompt

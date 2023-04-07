@@ -23,7 +23,7 @@ var (
 )
 
 func init() {
-	flag.BoolVar(&echo, "echo", false, "Echo the prompt")
+	flag.BoolVar(&echo, "echo", false, "Echo the prompt and exit. Do not make network request.")
 	flag.Float64Var(&temperature, "temperature", 0, "Temperature affects the randomness of the response. Range 0 <= t <= 2, where 2 is most random. The default is 0.")
 	flag.StringVar(&model, "model", "gpt-3.5-turbo", "The OpenAI model to use. The default is 'gpt-3.5-turbo'")
 	flag.StringVar(&prompt, "prompt", "", "The literal prompt. If empty then STDIN data will be used")
@@ -52,7 +52,11 @@ func main() {
 	}
 
 	if systemPrompt == "" {
-		systemPrompt = aime.LookupSystemPrompt(systemPromptKey)
+		if config, err := aime.LoadConfig(); err != nil {
+			panic(err)
+		} else {
+			systemPrompt = aime.LookupSystemPrompt(systemPromptKey, config)
+		}
 	}
 
 	var messages = []*aime.Message{}
@@ -69,13 +73,28 @@ func main() {
 		Content: prompt,
 	})
 
-	req, err := aime.ToRequest(&aime.RequestData{
+	rd := &aime.RequestData{
 		Model:       model,
 		Messages:    messages,
 		Temperature: temperature,
-	})
+	}
+
+	req, err := aime.ToRequest(rd)
 	if err != nil {
 		panic(err)
+	}
+
+	if echo {
+		if output == "inline" {
+			fmt.Printf("%s\n%s\n\n", systemPrompt, prompt)
+		} else {
+			if b, err := json.Marshal(rd); err != nil {
+				panic(err)
+			} else {
+				fmt.Println(string(b))
+			}
+		}
+		return
 	}
 
 	var opts = []aime.ClientOption{}
@@ -95,10 +114,6 @@ func main() {
 		panic(err)
 	}
 
-	if echo {
-		fmt.Printf("%s\n%s\n\n", systemPrompt, prompt)
-	}
-
 	if output == "inline" {
 		for _, c := range data.Choices {
 			fmt.Println(c.Message.Content)
@@ -110,5 +125,4 @@ func main() {
 			fmt.Println(string(b))
 		}
 	}
-
 }
